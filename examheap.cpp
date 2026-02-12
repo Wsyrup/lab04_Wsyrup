@@ -61,7 +61,42 @@ int main(int argc, char *argv[]) {
     if (t == 5){
         cout << "testing with very large data set ... ";
         numvals = 20000;
-    } 
+    }
+    if (t == 6) {
+        cout << "testing heapify with small data set ... ";
+        vector<int> vals = {9, 3, 7, 1, 5, 6, 2, 8, 4};
+        Heap hf(vals.begin(), vals.end());
+        for (int v : vals) data.push(v);
+        while(!data.empty()){
+            assert(!hf.empty());
+            assert(data.top()==hf.top());
+            data.pop();
+            hf.pop();
+        }
+        assert(hf.empty());
+        cout << "PASSED\n";
+        return 0;
+    }
+    if (t == 7) {
+        cout << "testing heapify with large data set ... ";
+        numvals = 5000;
+        vector<int> vals;
+        for (int i = 0; i < numvals; i++) {
+            int arand = rand() % 2000;
+            vals.push_back(arand);
+            data.push(arand);
+        }
+        Heap hf(vals.begin(), vals.end());
+        while(!data.empty()){
+            assert(!hf.empty());
+            assert(data.top()==hf.top());
+            data.pop();
+            hf.pop();
+        }
+        assert(hf.empty());
+        cout << "PASSED\n";
+        return 0;
+    }
     for (int i=0; i < numvals; i++) {
             int arand = rand() % 2000;
             data.push(arand);
@@ -75,7 +110,7 @@ int main(int argc, char *argv[]) {
     }
     cout << "PASSED\n";
 
-        
+
     return 0;
 
 }

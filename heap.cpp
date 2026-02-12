@@ -5,6 +5,12 @@
 #include <iostream>
 using std::cout;
 
+// Builds a heap from the range [start, end) using the heapify algorithm
+// Should run in O(n) time
+Heap::Heap(std::vector<int>::iterator start, std::vector<int>::iterator end){
+
+}
+
 // Pushes a value into the heap, then ensures
 // the heap is correctly arranged
 void Heap::push(int value){
