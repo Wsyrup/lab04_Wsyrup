@@ -28,6 +28,9 @@ class Heap{
    //index swap
    void swap(int index1, int index2);
 
+   //recursive private heapify helper.
+   void heapify(std::vector<int>& vdata, int current_index);
+
 };
 
 #endif
