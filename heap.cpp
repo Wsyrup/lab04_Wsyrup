@@ -10,12 +10,36 @@ using std::cout;
 Heap::Heap(std::vector<int>::iterator start, std::vector<int>::iterator end){
   //O(n) average because half of the nodes are never pushed down, a fourth are pushed
   //down only once, etc...
+  //start from the first nonleaf node. Fill out its subtrees
 }
 
 // Pushes a value into the heap, then ensures
 // the heap is correctly arranged
 void Heap::push(int value){
   //needs to reheapify upward
+  //push_back into the vector.
+  //then, while the value is smaller than its parent, swap the two.
+  //reverse iteration?  from index i we go to (i-1) // 2
+
+  vdata.push_back(value);
+  std::vector<int>::iterator current = vdata.rbegin();
+  int current_index = value.size() - 1;
+  int parent_index = 0;
+
+  while (current_index > 0) {
+    parent_index = (current_index - 1) / 2;  
+    
+    if (vdata[current_index] < vdata[parent_index]) {
+      swap(current, vdata.begin() + parent_index);
+      current = vdata.begin() + parent_index;
+      current_index = parent_index; //current index halves on every iteration. O(logn runtime)
+    }
+    else { //heap property is finally fulfilled
+      return;
+    }
+  }
+
+  return;
 }
 
 // Pops the minimum value off the heap
@@ -49,9 +73,11 @@ void Heap::pop(){
     if (*(current + left_child_index) < *current || *(current + left_child_index + 1) < *current) {
       if (*(current + left_child_index) < *(current + left_child_index + 1)) {
         swap(current, current + left_child_index);
+        current_index = left_child_index;
       }
       else {
         swap(current, current + left_child_index + 1);
+        current_index = left_child_index + 1;
       }
 
       current = (*(current + left_child_index) < *(current + left_child_index + 1)) ? current + left_child_index : current + left_child_index + 1;
