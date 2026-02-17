@@ -11,15 +11,20 @@
 class Heap{
 
  public:
-    Heap() {}  // default constructor
-    Heap(std::vector<int>::iterator start, std::vector<int>::iterator end); // build a heap from a range using heapify
-    void push(int value);     // insert value; //duplicates are allowed
-    void pop(); // delete the min element
-    int top();
-    bool empty();
+   Heap() {}  // default constructor
+   Heap(std::vector<int>::iterator start, std::vector<int>::iterator end); // build a heap from a range using heapify
+   void push(int value);     // insert value; //duplicates are allowed
+   void pop(); // delete the min element
+   int top();
+   bool empty();
 
  private:
-    std::vector<int> vdata; //store the binary heap tree as a dynamic array
+   std::vector<int> vdata; //store the binary heap tree as a dynamic array
+
+   //additional private helper functions, for the public methods. 
+
+   void swap(std::vector<int>::iterator& first, std::vector<int>::iterator& second);
+
 };
 
 #endif
