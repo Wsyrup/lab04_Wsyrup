@@ -47,14 +47,18 @@ Heap::Heap(std::vector<int>::iterator start, std::vector<int>::iterator end){
 
 }
 
+//segfault on tests 6,7
 void Heap::heapify(std::vector<int>& vdata, int current_index) {
   if (current_index < 0) return;
   int left_child = 2 * current_index + 1;
   int right_child = 2 * current_index + 2;
 
-  if (left_child >= vdata.size()) return;
+  if (left_child >= int(vdata.size())) return;
 
-  if (right_child >= vdata.size()) { //only left child. Special case of first node
+  //on all comparisons to vdata.size(), we have the "different signedness"
+  //error, since vdata.size() gives a size_t, which is unsigned. Change
+  //left, right to unsigned integers. 
+  if (right_child >= int(vdata.size())) { //only left child. Special case of first node
     if (vdata[left_child] < vdata[current_index]) swap(left_child, current_index);
     heapify(vdata, left_child);
   }
@@ -72,6 +76,9 @@ void Heap::heapify(std::vector<int>& vdata, int current_index) {
 
 // Pushes a value into the heap, then ensures
 // the heap is correctly arranged
+
+//4 values works, 3 values does not. 
+//20000 values does not either.
 void Heap::push(int value){
   //needs to reheapify upward
   //push_back into the vector.
@@ -79,7 +86,6 @@ void Heap::push(int value){
   //reverse iteration?  from index i we go to (i-1) // 2
 
   vdata.push_back(value);
-  std::vector<int>::iterator current = vdata.begin() + vdata.size() - 1;
   int current_index = vdata.size() - 1;
   int parent_index = 0;
 
@@ -87,8 +93,7 @@ void Heap::push(int value){
     parent_index = (current_index - 1) / 2;  
     
     if (vdata[current_index] < vdata[parent_index]) {
-      swap(current, vdata.begin() + parent_index);
-      current = vdata.begin() + parent_index;
+      swap(current_index, parent_index);
       current_index = parent_index; //current index halves on every iteration. O(logn runtime)
     }
     else { //heap property is finally fulfilled
@@ -102,8 +107,61 @@ void Heap::push(int value){
 // Pops the minimum value off the heap
 // (but does not return it), then ensures
 // the heap is correctly arranged
+//this or top stop working on cases 2,4,5
 void Heap::pop(){
   //needs to reheapify downward
+
+  if (vdata.size() <= 0) return;
+
+  swap(0, vdata.size()-1);
+  vdata.pop_back();
+
+  int current_index = 0;
+  int left_index = 0;
+  int right_index = 0;
+
+  while (left_index < int(vdata.size())) {
+    left_index = current_index * 2 + 1;
+    right_index = left_index + 1;
+
+    if (left_index >= int(vdata.size())) {
+      return;
+    }
+    else if (right_index >= int(vdata.size())) {
+      //only left index is valid.
+      if (vdata[current_index] > vdata[left_index]) {
+        swap(current_index, left_index);
+        current_index = left_index;
+      }
+    }
+    else { //bubble down, and send current down to bubbled down index.
+      if (vdata[current_index] > vdata[left_index] || vdata[current_index] > vdata[right_index]) {
+        (vdata[right_index] > vdata[left_index]) ? swap(current_index, left_index) : swap(current_index, right_index);
+        current_index = (vdata[right_index] > vdata[left_index]) ? left_index : right_index;
+      }
+      else {
+        return;
+      }
+    }
+  }
+
+  return;
+  
+  //[2, 3, 4, 5, 6, 7, 8]
+  //pop:
+  //[3, 5, 4, 8, 6, 7]
+  //current = 8 (3)
+  // left = 5 (7) <-- OoB, return
+  // right = 6 (4)
+  //left >= size() F
+  //right >= size() F
+  //current > left || current > right T
+  //right > left -> swap(current, left)
+  //current = left
+  //
+
+}
+
   //store final element.
   //replace root element (idx 0) with final element (idx size()-1) and pop back
   //then, compare new root element with its children. Since we are building a min heap,
@@ -114,42 +172,22 @@ void Heap::pop(){
   //becomes the child of the swapped smaller one.
   //need to deal with index out of bounds
 
-  int final_leaf = vdata[vdata.size()-1];
-
-  vdata[0] = final_leaf;
-  vdata.pop_back();
-
-  std::vector<int>::iterator current = vdata.begin();
-  int current_index = 0;
-  int left_child_index = 0;
-
-  //last parent node is found at (n-1) // 2
-  while (current_index <= (vdata.size()-2)/2) { //vdata.size()-1 gives n, but the last parent is at n-1/2
-    //compare with children
-    left_child_index = (2 * current_index) + 1;
-    if (*(current + left_child_index) < *current || *(current + left_child_index + 1) < *current) {
-      if (*(current + left_child_index) < *(current + left_child_index + 1)) {
-        swap(current, current + left_child_index);
-        current_index = left_child_index;
-      }
-      else {
-        swap(current, current + left_child_index + 1);
-        current_index = left_child_index + 1;
-      }
-
-      current = (*(current + left_child_index) < *(current + left_child_index + 1)) ? current + left_child_index : current + left_child_index + 1;
-    }
-    else { // !(left < current || right < current) = (left >= current && right >= current)
-      return;
-    }
+      //iterator solution makes this cumbersome. using indices instead
+    // if (*(current + left_child_index) < *current || *(current + left_child_index + 1) < *current) {
+    //   if (*(current + left_child_index) < *(current + left_child_index + 1)) {
+    //     swap(current, current + left_child_index);
+    //     current_index = left_child_index;
+    //   }
+    //   else {
+    //     swap(current, current + left_child_index + 1);
+    //     current_index = left_child_index + 1;
+    //   }
 
     //need to handle case where no right child
-  }
 
-  return;
-}
 
 // Returns the minimum element in the heap
+//fails on tests 2, 4, 5
 int Heap::top(){
   return (vdata.size() == 0) ? NULL : vdata[0];
 }
@@ -176,3 +214,34 @@ void Heap::swap(int index1, int index2) {
   vdata[index2] = temp;
 }
     
+
+
+/*
+  //last parent node is found at (n-1) // 2
+  while (current_index < (vdata.size()-1)/2) { //vdata.size()-1 gives n, but the last parent is at n-1/2
+    //compare with children
+    left_child = (2 * current_index) + 1;
+    right_child = left_child + 1;
+
+    //leaf node
+    if (left_child >= vdata.size()) {
+      return;
+    }
+    else if (right_child >= vdata.size()) { //no right child
+      if (vdata[current_index] > vdata[left_child]) {
+        swap(current_index, left_child);
+        current_index = left_child;
+      }
+    }
+    else { //heap property comparison
+      if (vdata[current_index] > vdata[left_child] || vdata[current_index] > vdata[right_child]) {
+        (vdata[left_child] < vdata[right_child]) ? swap(left_child, current_index) : swap(right_child, current_index);
+        current_index = (vdata[left_child] < vdata[right_child]) ? left_child : right_child;
+      }
+      else { //heap property is satisfied.
+        return;
+      }
+    }
+  }
+
+  return;*/
