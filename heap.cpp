@@ -14,38 +14,65 @@ Heap::Heap(std::vector<int>::iterator start, std::vector<int>::iterator end){
   //then repeat for the next nonleaf node.  
 
   //at this point, vdata should be an empty array
-  copy(start, end, vdata.begin());
+  vdata.insert(vdata.end(), start, end);
   
-  int current_index = (vdata.size() - 2)/2;
+  int current_index = (vdata.size() - 2)/2; //first non-leaf index
+  //need to keep track of which index we need to return to as well
+  int return_index = current_index;
   
-  heapify(vdata, current_index);
+  // heapify(vdata, current_index);
+  int left_child = 2*current_index + 1;
+  int right_child = left_child + 1;
 
-  // while (current_index >= 0) {
-  //   left_child = 2 * current_index + 1;
-  //   right_child = 2 * current_index + 2;
+  while (current_index >= 0) {
+    //analyze left and right
+    //if heap property is not fulfilled, swap with lesser, then enter the subtree and ensure heap property is fulfilled there as well
+    //if heap property is fulfilled, decrement by one to move onto the next nonleaf node.
 
-  //   if (right_child > vdata.size()) { //only left child. Special case of first node
-  //     if (vdata[left_child] < vdata[current_index]) swap(left_child, current_index);
-  //   }
-  //   else { //two children. Swap with lesser of the two
-  //     if (vdata[current_index] > vdata[left_child] || vdata[current_index] > vdata[right_child]) {
-  //       //heap property is unsatisfied
-  //       (vdata[left_child] < vdata[right_child]) ? swap(left_child, current_index) : swap(right_child, current_index);
-  //     }
-  //   }
+    //base case: leaf node. 
+    if (left_child >= int(vdata.size())) {
+      return_index--;
+      current_index = return_index; //"return" to the original spot, since we've reached a leaf => heap property was satisfied all the way down
+    }
+    //special case: no right child -> only check left;
+    else if (right_child >= int(vdata.size())) {
+      if (vdata[left_child] < vdata[current_index]) {
+        swap(left_child, current_index);
+        current_index = left_child; //enter the subtree to ensure heap property is satisfied there as well
+      }
+      else {
+        return_index--;
+        current_index = return_index; //"return" to where we left from
+      }
+    }
+    else if (vdata[left_child] < vdata[current_index] || vdata[right_child] < vdata[current_index]) {
+      if (vdata[left_child] < vdata[right_child]) {
+        swap(left_child, current_index);
+        current_index = left_child;
+      }
+      else {
+        swap(right_child, current_index);
+        current_index = right_child;
+      }
+    }
+    else { //heap property is satisfied.
+      return_index--;
+      current_index = return_index; //move on to next "nonleaf" node
+    }
 
-  //   //if neither condition runs, the heap property is satisfied for the data.
-  //   //move on to the next nonleaf node (current_index - 1) and repeat.
-  //   //if we swap, we need to enter that subtree to make sure the heap property is satisfied there too
-  //   //we can do this by setting current_index to the child and running the loop again. Once the 
-  //   //loop satisfies, we return to previous indeices and move on.
-  //   //maybe recursive?
-
-  // }
-
-
+    left_child = 2*current_index + 1;
+    right_child = left_child + 1;
+  }
 
 }
+
+//   //if neither condition runs, the heap property is satisfied for the data.
+//   //move on to the next nonleaf node (current_index - 1) and repeat.
+//   //if we swap, we need to enter that subtree to make sure the heap property is satisfied there too
+//   //we can do this by setting current_index to the child and running the loop again. Once the 
+//   //loop satisfies, we return to previous indeices and move on.
+//   //maybe recursive?
+
 
 //segfault on tests 6,7
 void Heap::heapify(std::vector<int>& vdata, int current_index) {
