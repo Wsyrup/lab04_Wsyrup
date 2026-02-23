@@ -117,49 +117,43 @@ void Heap::pop(){
   vdata.pop_back();
 
   int current_index = 0;
-  int left_index = 0;
-  int right_index = 0;
+  int left_index = 1;
+  int right_index = left_index + 1;
 
   while (left_index < int(vdata.size())) {
-    left_index = current_index * 2 + 1;
-    right_index = left_index + 1;
-
-    if (left_index >= int(vdata.size())) {
-      return;
-    }
-    else if (right_index >= int(vdata.size())) {
+    if (right_index >= int(vdata.size())) {
       //only left index is valid.
       if (vdata[current_index] > vdata[left_index]) {
         swap(current_index, left_index);
         current_index = left_index;
       }
+      else {
+        return;
+      }
     }
     else { //bubble down, and send current down to bubbled down index.
       if (vdata[current_index] > vdata[left_index] || vdata[current_index] > vdata[right_index]) {
-        (vdata[right_index] > vdata[left_index]) ? swap(current_index, left_index) : swap(current_index, right_index);
-        current_index = (vdata[right_index] > vdata[left_index]) ? left_index : right_index;
+        if (vdata[right_index] > vdata[left_index]) {
+          swap(current_index, left_index);
+          current_index = left_index;
+        }
+        else {
+          swap(current_index, right_index);
+          current_index = right_index;
+        }
+        
+        //I found the bug. we swap the values at current_index and the smaller of the two, 
       }
       else {
         return;
       }
     }
+    
+    left_index = 2 * current_index + 1;
+    right_index = left_index + 1;
   }
 
   return;
-  
-  //[2, 3, 4, 5, 6, 7, 8]
-  //pop:
-  //[3, 5, 4, 8, 6, 7]
-  //current = 8 (3)
-  // left = 5 (7) <-- OoB, return
-  // right = 6 (4)
-  //left >= size() F
-  //right >= size() F
-  //current > left || current > right T
-  //right > left -> swap(current, left)
-  //current = left
-  //
-
 }
 
   //store final element.
@@ -189,7 +183,7 @@ void Heap::pop(){
 // Returns the minimum element in the heap
 //fails on tests 2, 4, 5
 int Heap::top(){
-  return (vdata.size() == 0) ? NULL : vdata[0];
+  return vdata[0];
 }
 
 // Returns true if the heap is empty, false otherwise
