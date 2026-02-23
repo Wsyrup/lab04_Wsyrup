@@ -3,6 +3,9 @@
 CXX=g++
 CXXFLAGS=-g --std=c++20 -Wall
 
+all: heap.o examheap.o
+	${CXX} ${CXXFLAGS} heap.o examheap.o -o examheap
+
 tests: heap.o examheap.o
 	${CXX} ${CXXFLAGS} heap.o examheap.o -o tests
 

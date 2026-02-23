@@ -20,16 +20,9 @@ class Heap{
 
  private:
    std::vector<int> vdata; //store the binary heap tree as a dynamic array
-
-   //additional private helper functions, for the public methods. 
-   //iterator swap
-   void swap(std::vector<int>::iterator first, std::vector<int>::iterator second);
    
    //index swap
    void swap(int index1, int index2);
-
-   //recursive private heapify helper.
-   void heapify(std::vector<int>& vdata, int current_index);
 
 };
 
